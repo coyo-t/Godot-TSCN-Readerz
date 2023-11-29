@@ -8,61 +8,6 @@ from pprint import pprint
 DSKT = Path('D:/_projects/_desktop')
 PARA = Path('D:/_projects/parallel2shit/godot/font2')
 
-@dataclass(slots=True)
-class Rect:
-	x:int=0
-	y:int=0
-	wide:int=0
-	tall:int=0
-
-	@property
-	def area (self): return self.wide * self.tall
-
-	@classmethod
-	def from_dict (cls, d: dict):
-		return cls(
-			(co:=d['co'])[0], co[1],
-			(sz:=d['sz'])[0], sz[1]
-		)
-
-class Tex:
-	def __init__ (self):
-		self.image_index = -1
-		self.source = Rect()
-
-class Thing:
-	def __init__ (self):
-		self.ordinal = -1
-		self.tex: Tex|None = None
-		self.advance = 0
-		self.rise = 0
-
-
-	@property
-	def visible (self): return self.tex is not None
-
-
-
-def main ():
-	pt = DSKT/'gdfont outp3'
-
-	jdec = JSONDecoder()
-
-	raw_things = jdec.decode((pt/'test.txt').read_text('utf8'))
-	# pprint.pprint()
-
-	things = list[Thing]()
-	for thing in raw_things['things']:
-		th = Thing()
-		th.ordinal = thing['ord']
-		if 'image_index' in thing:
-			tex = Tex()
-			tex.image_index = thing['image_index']
-			tex.source = Rect.from_dict(thing['tex'])
-			th.advance = tex.source.wide
-
-		print(thing)
-
 @dataclass
 class Sect:
 	name: str
@@ -206,5 +151,4 @@ def main2 ():
 
 
 if __name__ == '__main__':
-	# main()
 	main2()
