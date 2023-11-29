@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 import string
 from reader import Reader as StringReader
+from gdtypes import *
 
 WHITESPACE = string.whitespace
 STARTS_NUMBER = '-+'+string.digits
@@ -14,6 +15,10 @@ class Sect:
 	name: str
 	props: dict = field(default_factory=dict)
 	body:  dict = field(default_factory=dict)
+	def get_prop (self, key:str, default=None):
+		if key in self.props:
+			return self.props[key]
+		return default
 
 @dataclass
 class Constructor:
@@ -33,6 +38,10 @@ strsimplematch = {
 	'\\': '\\',
 }
 
+typematches = {
+	'Rect2': Rect2,
+	'Vector2': Vector2
+}
 
 # THIS IS AWFUL BAD BAD BAD FFFFFFFFFFFFFFFF
 def digest_string (s: str):
@@ -61,6 +70,7 @@ def digest_string (s: str):
 		outs += ch
 		i += 1
 	return outs
+
 
 class GDReader:
 	def __init__ (self, src_text:str):
@@ -145,6 +155,8 @@ class GDReader:
 			self.skip_whitespace()
 			assert f.vore('('), f'Unknown raw identifier {name}'
 			args = self.read_array(')', 'constructor args')
+			if name in typematches:
+				return typematches[name](*args)
 			return Constructor(name, args)
 		if f.vore('['):
 			return self.read_array()
